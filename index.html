@@ -235,6 +235,7 @@ tr.out td{opacity:.62}
 </header>
 <nav id="tabs"></nav>
 <main id="view"></main>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
 
 <script>
 "use strict";
@@ -494,6 +495,55 @@ function addAiScen(){
   render();
 }
 
+function exportScenarios(){
+  const blob = new Blob([JSON.stringify(store, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "mondial-2026-nichushim.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importScenarios(data){
+  let imported = [];
+  if(data && Array.isArray(data.list)){
+    imported = data.list.map(s => ({
+      id: newId(),
+      name: (s.name || "ניחוש מיובא").slice(0, 80),
+      results: s.results || {},
+    }));
+  }else if(data && data.results && typeof data.results === "object"){
+    imported = [{ id: newId(), name: (data.name || "ניחוש מיובא").slice(0, 80), results: data.results }];
+  }else if(data && typeof data === "object" && !Array.isArray(data)){
+    // legacy wc26-results format: { "1": {a,b}, ... }
+    const looksLegacy = Object.keys(data).every(k => /^\d+$/.test(k));
+    if(looksLegacy && Object.keys(data).length > 0){
+      imported = [{ id: newId(), name: "ניחוש מיובא", results: data }];
+    }
+  }
+  if(!imported.length){ alert("קובץ לא תקין."); return; }
+  const mode = store.list.length === 1 && filledCount() === 0
+    ? "replace"
+    : (confirm(`לייבא ${imported.length} ניחוש/ים?\n\nאישור = הוספה לניחושים הקיימים\nביטול = ביטול`) ? "merge" : null);
+  if(!mode) return;
+  if(mode === "replace") store.list = imported;
+  else store.list.push(...imported);
+  store.active = imported[imported.length - 1].id;
+  results = activeScen().results;
+  saveStore();
+  alert(`יובאו ${imported.length} ניחוש/ים בהצלחה!`);
+  render();
+}
+
+function handleImportFile(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{ importScenarios(JSON.parse(reader.result)); }
+    catch(e){ alert("קובץ JSON לא תקין."); }
+  };
+  reader.readAsText(file);
+}
+
 /* ---------- standings logic ---------- */
 function emptyStat(t){ return {team:t,P:0,W:0,D:0,L:0,GF:0,GA:0,GD:0,Pts:0}; }
 function computeStats(teams, matches){
@@ -678,6 +728,8 @@ function renderScenBar(){
     <button data-scen="rename" title="שינוי שם הניחוש הנוכחי">שינוי שם</button>
     <button data-scen="del" class="danger" title="מחיקת הניחוש הנוכחי">מחיקה</button>
     <button data-scen="ai" class="ai" title="ניחוש מלא של ה-AI לכל 104 המשחקים — נוצר כניחוש חדש ונפרד">🤖 ניחוש ה-AI</button>
+    <button data-scen="export" title="שמירת כל הניחושים לקובץ">⬇ ייצוא</button>
+    <button data-scen="import" title="טעינת ניחושים מקובץ">⬆ ייבוא</button>
     ${firebaseReady ? `<button data-scen="pub" class="pub" title="פרסום הניחוש הנוכחי לכולם">📢 פרסם לקהילה</button>` : ""}`;
 }
 
@@ -900,6 +952,11 @@ function render(){
 /* ---------- events ---------- */
 document.addEventListener("change", e => {
   const el = e.target;
+  if(el.id === "importFile" && el.files[0]){
+    handleImportFile(el.files[0]);
+    el.value = "";
+    return;
+  }
   if(el.id === "scenSelect"){
     switchScen(el.value);
     return;
@@ -940,6 +997,8 @@ document.addEventListener("click", e => {
     else if(act === "del") deleteScen();
     else if(act === "ai") addAiScen();
     else if(act === "pub") publishGuess();
+    else if(act === "export") exportScenarios();
+    else if(act === "import") document.getElementById("importFile").click();
     return;
   }
   if(e.target.id === "resetBtn"){
