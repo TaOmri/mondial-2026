@@ -26,6 +26,29 @@
 - כפתור **איפוס** מנקה רק את הניחוש הנוכחי.
 - **🤖 ניחוש ה-AI** — יוצר ניחוש חדש ("טופס 2 — ניחוש ה-AI") עם תחזית מלאה לכל 104 המשחקים, מבוססת על תחזיות Opta, שוקי ההימורים ודירוג פיפ"א (נכון ליוני 2026). לא נוגע בניחושים הקיימים.
 
+## שיתוף קהילתי (כולם רואים את הניחושים)
+
+- **📢 פרסם לקהילה** — מפרסם את הניחוש הפעיל שלך לענן, כך שכולם יוכלו לראות
+- **טאב קהילה** — רשימת כל הניחושים שפורסמו (שם, כותרת, אלופה חזויה, תאריך)
+- **צפייה** — כל אחד יכול לפתוח ניחוש של אחר ולראות בתים + נוקאאוט (קריאה בלבד)
+- הניחושים הפרטיים שלך נשארים ב-localStorage — פרסום לא מוחק ולא משנה אותם
+
+### הגדרת Firebase (פעם אחת, ~10 דקות)
+
+1. [Firebase Console](https://console.firebase.google.com) → Create project
+2. **Build → Firestore Database** → Create database → Start in **test mode** (או העתק את `firestore.rules`)
+3. **Project settings → Your apps → Web** → העתק את ההגדרות
+4. הדבק ב-[firebase-config.js](firebase-config.js) (ראה [firebase-config.example.js](firebase-config.example.js))
+5. Firestore → Rules → הדבק את תוכן [firestore.rules](firestore.rules) → Publish
+6. העלה ל-GitHub: `git add . && git commit -m "Add community sharing" && git push`
+
+אחרי ההגדרה, כפתור **פרסם לקהילה** וטאב **קהילה** יעבדו לכולם.
+
+## פרסום באינטרנט (GitHub Pages)
+
+האתר זמין ב: `https://taomri.github.io/mondial-2026/`
+
 ## טיפים
 
-- הנתונים נשמרים ב-localStorage של הדפדפן — אם פותחים בדפדפן אחר, התוצאות לא יעברו.
+- בלי Firebase — הנתונים נשמרים רק ב-localStorage של הדפדפן
+- עם Firebase — כולם יכולים לפרסם ולצפות בניחושים של אחרים

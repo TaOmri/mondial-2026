@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /guesses/{guessId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['author', 'title', 'results', 'matchCount', 'createdAt'])
+        && request.resource.data.author is string
+        && request.resource.data.author.size() >= 1
+        && request.resource.data.author.size() <= 40
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 1
+        && request.resource.data.title.size() <= 80
+        && request.resource.data.results is map
+        && request.resource.data.matchCount is int
+        && request.resource.data.matchCount >= 0
+        && request.resource.data.matchCount <= 104
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+  }
+}
