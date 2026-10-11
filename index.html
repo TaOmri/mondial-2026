@@ -703,7 +703,7 @@ function resolveSlot(m, src){
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function teamHtml(code, extra){
   const t = TEAMS[code];
-  return `<span class="flag">${t.f}</span><span class="name ${extra||""}">${esc(t.he)}</span>`;
+  return `<span class="flag">${t.f}</span><span class="name ${extra||""}">${esc(t.name)}</span>`;
 }
 function fmtDate(d){
   return new Date(d + "T12:00:00").toLocaleDateString("en-US", {weekday:"long", month:"long", day:"numeric"});
@@ -798,7 +798,7 @@ function standingsTable(g){
     }
     return `<tr class="${cls}">
       <td class="pos">${i+1}</td>
-      <td class="team-cell"><span class="flag">${TEAMS[s.team].f}</span> ${esc(TEAMS[s.team].he)}</td>
+      <td class="team-cell"><span class="flag">${TEAMS[s.team].f}</span> ${esc(TEAMS[s.team].name)}</td>
       <td>${s.P}</td><td>${s.W}</td><td>${s.D}</td><td>${s.L}</td>
       <td>${s.GF}-${s.GA}</td><td>${s.GD>0?"+":""}${s.GD}</td><td class="pts">${s.Pts}</td>
     </tr>`;
@@ -869,7 +869,7 @@ function renderThirds(){
     return `<tr class="${cls}">
       <td class="pos">${i+1}</td>
       <td>${s.g}</td>
-      <td class="team-cell"><span class="flag">${TEAMS[s.team].f}</span> ${esc(TEAMS[s.team].he)}</td>
+      <td class="team-cell"><span class="flag">${TEAMS[s.team].f}</span> ${esc(TEAMS[s.team].name)}</td>
       <td>${s.P}</td><td>${s.GF}-${s.GA}</td><td>${s.GD>0?"+":""}${s.GD}</td><td class="pts">${s.Pts}</td>
     </tr>`;
   }).join("");
