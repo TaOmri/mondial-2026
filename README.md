@@ -1,54 +1,60 @@
-# מונדיאל 2026 — מעקב תוצאות ⚽🏆
+# World Cup 2026 Predictor ⚽🏆
 
-אפליקציית ווב פשוטה למעקב אחרי המונדיאל בקנדה, מקסיקו וארה"ב (11.6–19.7.2026).
-ממלאים רק תוצאות — וכל הטבלאות ועץ הנוקאאוט נבנים אוטומטית.
+**Live:** https://taomri.github.io/mondial-2026/
 
-## איך משתמשים
+Enter match scores and the whole 2026 FIFA World Cup builds itself. Group tables, the third-place ranking and the full knockout bracket all update automatically, down to the champion.
 
-1. פותחים את `index.html` בדאבל-קליק (נפתח בדפדפן, לא צריך אינטרנט).
-2. מזינים תוצאת משחק בשני השדות שליד כל משחק.
-3. זהו. הכול מתעדכן לבד ונשמר אוטומטית בדפדפן.
+The 2026 tournament is the first with 48 teams, so predicting it by hand is hard. The 8 best third-placed teams (out of 12 groups) go through, and where each one lands in the Round of 32 depends on *which* groups they come from. This app works all of that out for you using FIFA's official rules.
 
-## מה יש בפנים
+## Features
 
-- **שלב הבתים** — כל 12 הבתים (72 משחקים) עם ההגרלה הרשמית, טבלה מתעדכנת לכל בית לפי כללי פיפ"א (נקודות ← הפרש שערים ← שערי זכות ← מאזן ישיר).
-- **לוח משחקים** — כל 104 המשחקים מסודרים לפי תאריך.
-- **שלישיות** — דירוג 12 הנבחרות שסיימו שלישיות; 8 הטובות מעפילות.
-- **נוקאאוט** — עץ מלא משלב ה-32 ועד הגמר. שיבוץ השלישיות נעשה אוטומטית לפי הטבלה הרשמית של פיפ"א (Annex C, כל 495 הצירופים). משחק שנגמר בתיקו פותח שדות פנדלים.
+- **Group stage**: all 12 groups and 72 matches, with live standings using FIFA tie-breakers
+- **Schedule**: all 104 matches by date, with host city
+- **Third places**: ranks the 12 third-placed teams and highlights the 8 that qualify
+- **Knockout bracket**: from the Round of 32 to the final. Pairings fill in automatically, and a drawn match opens penalty inputs
+- **Multiple predictions**: create, duplicate, rename and delete separate predictions, then switch between them
+- **AI prediction**: one click adds a ready-made prediction for all 104 matches (a fixed set based on Opta forecasts, betting markets and FIFA rankings as of June 2026)
+- **Community**: publish a prediction under your name, browse everyone else's in real time and open any of them read-only. You can delete your own posts
+- **Export / import**: save all your predictions to a JSON file and load them on another device
 
-## ניחושים מרובים
+## How it works
 
-אפשר לנהל כמה ניחושים (תרחישים) במקביל — בלי שאחד יפגע בשני:
+**Group standings.** Wins are worth 3 points and draws 1. Teams are ranked by points, then goal difference, then goals scored. Teams that are still level are re-ranked on a mini-table of only the matches between them (head-to-head), and the draw order breaks any tie that remains.
 
-- **הבורר בכותרת** מחליף בין ניחושים, וכל הטבלאות והעץ מציגים את הניחוש שנבחר.
-- **+ חדש** — ניחוש ריק. **שכפול** — עותק של הניחוש הנוכחי כנקודת פתיחה לתרחיש חלופי.
-- **שינוי שם** ו**מחיקה** פועלים על הניחוש הנוכחי (מחיקה עם אישור).
-- כפתור **איפוס** מנקה רק את הניחוש הנוכחי.
-- **🤖 ניחוש ה-AI** — יוצר ניחוש חדש ("טופס 2 — ניחוש ה-AI") עם תחזית מלאה לכל 104 המשחקים, מבוססת על תחזיות Opta, שוקי ההימורים ודירוג פיפ"א (נכון ליוני 2026). לא נוגע בניחושים הקיימים.
+**Third-place slotting (FIFA Annex C).** Once every group is complete, the letters of the 8 qualifying groups (e.g. `ABCDEFGH`) form the key to a 495-entry lookup table. The table says which third-placed team each group winner (1A, 1B, 1D, 1E, 1G, 1I, 1K, 1L) plays in the Round of 32.
 
-## שיתוף קהילתי (כולם רואים את הניחושים)
+**Bracket resolution.** Every knockout slot is a short code: `1A` / `2B` (a group position), `3` (an Annex C slot), or `W89` / `L101` (the winner or loser of an earlier match). Slots resolve recursively, so the entire bracket is described by 32 lines of data.
 
-- **📢 פרסם לקהילה** — מפרסם את הניחוש הפעיל שלך לענן, כך שכולם יוכלו לראות
-- **טאב קהילה** — רשימת כל הניחושים שפורסמו (שם, כותרת, אלופה חזויה, תאריך)
-- **צפייה** — כל אחד יכול לפתוח ניחוש של אחר ולראות בתים + נוקאאוט (קריאה בלבד)
-- הניחושים הפרטיים שלך נשארים ב-localStorage — פרסום לא מוחק ולא משנה אותם
+Fair-play points and FIFA-ranking tie-breakers are not calculated.
 
-### הגדרת Firebase (פעם אחת, ~10 דקות)
+## Tech stack
 
-1. [Firebase Console](https://console.firebase.google.com) → Create project
-2. **Build → Firestore Database** → Create database → Start in **test mode** (או העתק את `firestore.rules`)
-3. **Project settings → Your apps → Web** → העתק את ההגדרות
-4. הדבק ב-[firebase-config.js](firebase-config.js) (ראה [firebase-config.example.js](firebase-config.example.js))
-5. Firestore → Rules → הדבק את תוכן [firestore.rules](firestore.rules) → Publish
-6. העלה ל-GitHub: `git add . && git commit -m "Add community sharing" && git push`
+- Plain HTML, CSS and JavaScript in one file, with no framework and no build step
+- Firebase Firestore for published predictions, with a realtime listener
+- Firebase Anonymous Auth so only the author can delete a post
+- `localStorage` for private predictions
+- GitHub Pages for hosting
 
-אחרי ההגדרה, כפתור **פרסם לקהילה** וטאב **קהילה** יעבדו לכולם.
+## Project structure
 
-## פרסום באינטרנט (GitHub Pages)
+```
+index.html                  The whole app (markup, styles, data and logic)
+firebase-config.js          Firebase web config (public by design)
+firebase-config.example.js  Template for your own Firebase project
+firestore.rules             Firestore security rules
+```
 
-האתר זמין ב: `https://taomri.github.io/mondial-2026/`
+## Running locally
 
-## טיפים
+Open `index.html` in a browser. Your predictions are saved in your browser's `localStorage`. The Community tab needs an internet connection and a configured Firebase project.
 
-- בלי Firebase — הנתונים נשמרים רק ב-localStorage של הדפדפן
-- עם Firebase — כולם יכולים לפרסם ולצפות בניחושים של אחרים
+## Firebase setup (for your own copy)
+
+1. Create a project in the [Firebase Console](https://console.firebase.google.com).
+2. **Build → Firestore Database → Create database.**
+3. **Project settings → Your apps → Web**, then copy the config into `firebase-config.js` (see `firebase-config.example.js`).
+4. **Firestore → Rules**: paste the contents of `firestore.rules` and click **Publish**.
+5. **Authentication → Sign-in method → Anonymous → Enable.**
+6. Deploy (for example with GitHub Pages).
+
+The security rules let anyone read posts and check each new post's shape: name 1–40 characters, title 1–80 characters, at most 104 matches, and a server-side timestamp. Only signed-in users can create posts, only the original author can delete one, and posts can't be edited.
